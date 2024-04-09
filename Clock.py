@@ -227,7 +227,8 @@ def main():
             fw = open('session.json', 'w')
             json.dump(dick, fw)
             #update logfile
-            l = open("timesheet.log", 'a')
+            logfile = log.project + ".log"
+            l = open(logfile, 'a')
             out = log.__str__()
             l.write(out)
 
