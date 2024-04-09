@@ -82,7 +82,8 @@ class logEntry:
         #set total hours
         difference = self.end - self.start
         seconds = difference.total_seconds()
-        self.total = seconds/3600.0
+        hours = seconds/3600.0
+        self.total = round(hours, 2)
 
         #close session
         self.open = False
@@ -231,6 +232,7 @@ def main():
             l = open(logfile, 'a')
             out = log.__str__()
             l.write(out)
+            l.close()
 
            
 if __name__ == "__main__":
