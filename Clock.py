@@ -16,23 +16,22 @@ def offset():
 
 #make small class: logEntry
 class logEntry:
-    def __init__(self, manager, start = None, project = None):
+    def __init__(self, manager, start = None, project = None, end = None, total = None, description = None):
     #attributes:
         #start time
         self.start = start
         #project
         self.project = project
         #end time
-        self.end
+        self.end = end
         #total time (in hours)
-        self.total
+        self.total = total
         #description of work
-        self.description
+        self.description = description
         #project manager
         self.manager = manager
         #session state
-        self.open
-
+        self.open = False
 
     #member functions:
     
@@ -44,8 +43,16 @@ class logEntry:
         self.manager.display()
         print ("Enter 1-5 to pick existing project or enter new project name")
         p = input(" > project: ")
-        if p >= 1 and p <= 5:
-            self.project = self.manager.getProject(p)
+        valid = False
+        try:
+            n = int(p)
+            if n >= 1 and n <= 5:
+                self.project = self.manager.getProject(p)
+                valid = True
+        except:
+            pass
+        if valid: 
+            pass
         else:
             self.project = p
             self.manager.declareProject(p)
@@ -78,7 +85,7 @@ class logEntry:
             self.end = time
         
         #set total hours
-        difference = self.start - self.end
+        difference = self.end - self.start
         seconds = difference.total_seconds()
         self.total = seconds/3600.0
 
@@ -92,7 +99,7 @@ class logEntry:
         #   total hours: <total time in hours>, project: <project>
         #   <description>
 
-        return self.start.strftime() + " - " + self.end.strftime() + "\n\ttotal hours: " + str(self.total) + ", project: " + self.project + "\n\t" + self.description + "\n"
+        return self.start.strftime("%m/%d/%Y %H:%M") + " - " + self.end.strftime("%m/%d/%Y %H:%M") + "\n\ttotal hours: " + str(self.total) + ", project: " + self.project + "\n\t" + self.description + "\n"
 
 
 #make small class: projectManager
@@ -101,11 +108,17 @@ class projectManager:
     def __init__(self, filename):
         #filename
         self.filename = filename
+        self.cap = 5
         #stack(LIFO) of recent projects (most recent 5)
         #initialize stack from filename
-        f = open(filename)
-        self.stack = json.load(f)
-        f.close()
+        try:
+            f = open(filename)
+            self.stack = json.load(f)
+            f.close()
+            self.size = len(self.stack)
+        except:
+            self.stack = []
+            self.size = 0
         
     #display most recent projects
     def display(self):
@@ -117,19 +130,36 @@ class projectManager:
     #use nth most recent project
     def getProject(self, n):
         #move to top of recents
-        self.push(self, self.stack[n-1], n-1)
+        self.push(self.stack[n-1])
         #return project name
         return self.stack[0]
     
     #create new project
     def declareProject(self, p):
         #add to top of recents
-        self.push(self, p, len(self.stack)-1)
+        self.push(p)
+        
 
-    def push(self, proj, n):
-        for i in range (n-1, -1, -1):
-            self.stack[i+1] = self.stack[i]
-        self.stack[0] = proj
+    def push(self, proj):
+        #check if existing
+        try:
+            i = self.stack.index(proj)
+        except:
+            i = -1
+        #if existing project
+        if i != -1:
+            #delete from current index
+            self.stack.pop(i)
+        #else if capacity is reached
+        elif self.size == self.cap:
+            #delete least recent
+            self.stack.pop(self.cap-1)
+        #else (not full and not existing)
+        else:
+            #update size
+            self.size += 1
+        #every case project being pushed goes in front
+        self.stack.insert(0,proj)
         #update file
         self.update()
         
@@ -138,43 +168,67 @@ class projectManager:
         f = open(self.filename, 'w')
         json.dump(self.stack, f)
 
+#Entry to dict function for storage
+def toDict(entry):
+    dick = {"start": datetime.datetime.strftime(entry.start, "%Y-%m-%dT%H:%M"), 
+            "project": entry.project,
+            "open": entry.open
+            }
+    return dick
+
+#Dict to entry for retrieval
+def toEntry(e, dick):
+    e.start = datetime.datetime.strptime(dick["start"], "%Y-%m-%dT%H:%M")
+    e.project = dick["project"]
+    e.open = dick["open"]
 
 #main function:
 def main():
     #initialize projectManager from filename
     manager = projectManager("projList.json")
+
+    #create new logEntry
+    log = logEntry(manager)
+
+    f = open('session.json', "r")
+
     #check for current clock in (from a previous session)
-    f = open('session.json')
-    entry = json.load(f)
-    cur = False
-    if entry.open:
+    try:
+        entry = json.load(f)
+        toEntry(log, entry)
+    except:
+        #no previous clock in
+        pass
+
+    if log.open:
         print ("active session found")
-        cur = True
+
+    f.close()
+
     #action loop:
-        #create logEntry
-        log = logEntry(manager)
-        #if no current clock in:
-        if not cur:
-            #clock in
-            print("type 'clock_in' when ready")
-            input(" > ") 
-            log.clock_in()
-            #update session file
-            json.dump(log, f)
-        #if current clock in:
-        else:
-            #get current clock in information
-            log = entry #I know this doesn't work but i still don't know how the jsom file thing works
-        #clock out
-        print("type 'clock_out' when ready")
-        input (" > ")
-        log.clock_out()
+    #if no current clock in:
+    if not log.open:
+        #clock in
+        print("type 'clock_in' when ready")
+        input(" > ") 
+        log.clock_in()
         #update session file
-        json.dump(log, f)
-        #update logfile
-        l = open("timesheet.log", 'a')
-        out = log.__str__()
-        l.write(out)
+        dick = toDict(log)
+        fw = open('session.json', 'w')
+        json.dump(dick, fw)   
+    #if current clock in:
+    #clock out
+    print("type 'clock_out' when ready")
+    input (" > ")
+    log.clock_out()
+    #update session file
+    dick = toDict(log)
+    fw = open('session.json', 'w')
+    json.dump(dick, fw)
+    #update logfile
+    l = open("timesheet.log", 'a')
+    out = log.__str__()
+    l.write(out)
 
            
 if __name__ == "__main__":
