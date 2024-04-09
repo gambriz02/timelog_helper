@@ -10,7 +10,7 @@ def offset():
         bin = input(" > (y/n): ")
     if bin == 'y':
         print ("How many minutes would you like to offset by?")
-        off = input(" > (can be +/-): ")
+        off = int(input(" > (can be +/-): "))
         return datetime.timedelta(minutes=off)
     else: return -1
 
