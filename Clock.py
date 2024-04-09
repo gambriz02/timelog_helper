@@ -44,15 +44,10 @@ class logEntry:
         print ("Enter 1-5 to pick existing project or enter new project name")
         p = input(" > project: ")
         valid = False
-        try:
-            n = int(p)
-            if n >= 1 and n <= 5:
-                self.project = self.manager.getProject(p)
-                valid = True
-        except:
-            pass
-        if valid: 
-            pass
+        if p >= '1' and p <= '5':
+            self.project = self.manager.getProject(int(p))
+            valid = True
+        
         else:
             self.project = p
             self.manager.declareProject(p)
