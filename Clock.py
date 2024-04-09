@@ -201,29 +201,35 @@ def main():
     f.close()
 
     #action loop:
-    #if no current clock in:
-    if not log.open:
-        #clock in
-        print("type 'clock_in' when ready")
-        input(" > ") 
-        log.clock_in()
-        #update session file
-        dick = toDict(log)
-        fw = open('session.json', 'w')
-        json.dump(dick, fw)   
-    #if current clock in:
-    #clock out
-    print("type 'clock_out' when ready")
-    input (" > ")
-    log.clock_out()
-    #update session file
-    dick = toDict(log)
-    fw = open('session.json', 'w')
-    json.dump(dick, fw)
-    #update logfile
-    l = open("timesheet.log", 'a')
-    out = log.__str__()
-    l.write(out)
+    while True:
+        #if no current clock in:
+        if not log.open:
+            #clock in
+            print("enter anything to Clock In or <q> to quit")
+            res = input(" > ") 
+            if res == 'q':
+                break
+            log.clock_in()
+            #update session file
+            dick = toDict(log)
+            fw = open('session.json', 'w')
+            json.dump(dick, fw)   
+        #if current clock in:
+        else:
+            #clock out
+            print("enter anything to Clock Out or <q> to quit")
+            res = input (" > ")
+            if res == 'q':
+                break
+            log.clock_out()
+            #update session file
+            dick = toDict(log)
+            fw = open('session.json', 'w')
+            json.dump(dick, fw)
+            #update logfile
+            l = open("timesheet.log", 'a')
+            out = log.__str__()
+            l.write(out)
 
            
 if __name__ == "__main__":
