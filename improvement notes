@@ -1,0 +1,18 @@
+#bugs: 
+
+#possibly useful features:
+    create a database
+    login options
+    manual entry of start and end times
+    GUI
+    Allow to create subdivisions of project, e.g. project tasks
+
+#process features:
+    Unit testing
+
+#implemented:
+
+#tested:
+    unexpected close of terminal didn't save session
+    give option to display clock in data 
+    give option to discard clock in data

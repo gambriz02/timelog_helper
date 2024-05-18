@@ -3,7 +3,7 @@ import datetime
 
 #helper functions:
 def offset():
-    print ("Would you like to provide an offset?")
+    print ("Would you like to provide an adjustment?")
     bin = input(" > (y/n): ")
     while bin != 'y' and bin != 'n':
         print ("please enter either a y or an n")
@@ -94,8 +94,10 @@ class logEntry:
         #<start time> - <end time> 
         #   total hours: <total time in hours>, project: <project>
         #   <description>
-
-        return self.start.strftime("%m/%d/%Y %H:%M") + " - " + self.end.strftime("%m/%d/%Y %H:%M") + "\n\ttotal hours: " + str(self.total) + ", project: " + self.project + "\n\t" + self.description + "\n"
+        if self.open:
+            return "start time: " + self.start.strftime("%m/%d/%Y %H:%M") + "\nproject: " + self.project + "\n"
+        else:
+            return self.start.strftime("%m/%d/%Y %H:%M") + " - " + self.end.strftime("%m/%d/%Y %H:%M") + "\n\ttotal hours: " + str(self.total) + ", project: " + self.project + "\n\t" + self.description + "\n"
 
 
 #make small class: projectManager
@@ -203,10 +205,12 @@ def main():
 
     #action loop:
     while True:
+
         #if no current clock in:
         if not log.open:
-            #clock in
-            print("enter anything to Clock In or <q> to quit")
+        
+            #clock in procedure
+            print("(1) Clock In \n<q> Quit")
             res = input(" > ") 
             if res == 'q':
                 break
@@ -214,26 +218,47 @@ def main():
             #update session file
             dick = toDict(log)
             fw = open('session.json', 'w')
-            json.dump(dick, fw)   
+            json.dump(dick, fw) 
+            fw.close()  
+
         #if current clock in:
         else:
-            #clock out
-            print("enter anything to Clock Out or <q> to quit")
+            #display menu
+            print("(1) Clock Out \n(2) Display Clock Data \n(3) Discard Clock In \n<q> Quit")
             res = input (" > ")
+            
+            #exit procedure
             if res == 'q':
                 break
-            log.clock_out()
-            #update session file
-            dick = toDict(log)
-            fw = open('session.json', 'w')
-            json.dump(dick, fw)
-            #update logfile
-            logfile = log.project + ".log"
-            l = open(logfile, 'a')
-            out = log.__str__()
-            l.write(out)
-            l.close()
+        
+            #clock out procedure
+            elif res == '1':
+                log.clock_out()
+                #update session file
+                dick = toDict(log)
+                fw = open('session.json', 'w')
+                json.dump(dick, fw)
+                fw.close()
+                #update logfile
+                logfile = log.project + ".log"
+                l = open(logfile, 'a')
+                out = log.__str__()
+                l.write(out)
+                l.close()
 
-           
+            #display current session data
+            elif res == '2':
+                print (log.__str__())
+
+            #clear current session data
+            elif res == '3':
+                log.open = False
+
+                #update session file
+                dick = toDict(log)
+                fw = open('session.json', 'w')
+                json.dump(dick, fw)
+                fw.close()
+
 if __name__ == "__main__":
     main()
