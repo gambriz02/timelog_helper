@@ -36,12 +36,14 @@ def offset():
 
 #make small class: logEntry
 class logEntry:
-    def __init__(self, manager, start = None, project = None, end = None, total = None, description = None):
+    def __init__(self, manager, start = None, project = None, sp = None, end = None, total = None, description = None):
     #attributes:
         #start time
         self.start = start
         #project
         self.project = project
+        #sub-project header
+        self.sp = sp
         #end time
         self.end = end
         #total time (in hours)
@@ -59,19 +61,23 @@ class logEntry:
     def clock_in(self):
         #open session
         self.open = True
+        
         #ask current project:
         self.manager.display()
         print ("Enter 1-5 to pick existing project or enter new project name")
         p = input(" > project: ")
-        valid = False
         if p >= '1' and p <= '5':
             self.project = self.manager.getProject(int(p))
-            valid = True
         
         else:
             self.project = p
             self.manager.declareProject(p)
             print("Your project name: ", self.project)
+
+        #ask for subproject if applicable
+        print ("Enter a task or stage of the project you will be working on for the subheader")
+        subp = input(" > subheader: ")
+        self.sp = subp
 
         #get current time/date
         time = datetime.datetime.now()
@@ -113,11 +119,12 @@ class logEntry:
         #print format: 
         #<start time> - <end time> 
         #   total hours: <total time in hours>, project: <project>
+        #   task: <subheader>
         #   <description>
         if self.open:
-            return "start time: " + self.start.strftime("%m/%d/%Y %H:%M") + "\nproject: " + self.project + "\n"
+            return "start time: " + self.start.strftime("%m/%d/%Y %H:%M") + "\nproject: " + self.project + "\ntask: " + self.sp + "\n" 
         else:
-            return self.start.strftime("%m/%d/%Y %H:%M") + " - " + self.end.strftime("%m/%d/%Y %H:%M") + "\n\ttotal hours: " + str(self.total) + ", project: " + self.project + "\n\t" + self.description + "\n"
+            return self.start.strftime("%m/%d/%Y %H:%M") + " - " + self.end.strftime("%m/%d/%Y %H:%M") + "\n\ttotal hours: " + str(self.total) + ", project: " + self.project + "\n\ttask: " + self.sp + "\n\t" + self.description + "\n"
 
 
 #make small class: projectManager

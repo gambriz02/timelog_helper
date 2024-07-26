@@ -3,15 +3,14 @@
 #possibly useful features:
     create a database
     login options
-    manual entry of start and end times
     GUI
-    !! Allow to create subdivisions of project, e.g. project tasks 
-    !! Allow for recording breaks
+    Allow for recording breaks?
 
 #process features:
     Unit testing
 
 #implemented:
+Allow to create subdivisions of project, e.g. project tasks
 
 #tested:
     unexpected close of terminal didn't save session
