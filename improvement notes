@@ -5,7 +5,8 @@
     login options
     manual entry of start and end times
     GUI
-    Allow to create subdivisions of project, e.g. project tasks
+    !! Allow to create subdivisions of project, e.g. project tasks 
+    !! Allow for recording breaks
 
 #process features:
     Unit testing

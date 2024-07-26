@@ -4,10 +4,30 @@ import datetime
 #helper functions:
 def offset():
     print ("Would you like to provide an adjustment?")
-    bin = input(" > (y/n): ")
-    while bin != 'y' and bin != 'n':
-        print ("please enter either a y or an n")
-        bin = input(" > (y/n): ")
+    bin = input(" > (y/n or 1 for manual entry): ")
+    while bin != 'y' and bin != 'n' and bin != '1':    
+        print ("Please enter either a y or an n or a 1")
+        bin = input(" > (y/n or 1 for manual entry): ")
+
+    if bin == '1':
+        print ("Would you like the timestamp to be today? ")
+        
+        ans = input(" > (y/n): ")
+        while ans != 'y' and ans != 'n':
+            print ("Please enter either a y or an n")   
+            ans = input(" > (y/n): ")
+        
+        if ans == 'y':
+            print ("Please manually enter a time in the format YYYY-MM-DD HH:MM:SS")
+            date =  input(" > ")
+            
+
+        else:
+            print ("Please manually enter a time in the format HH:MM:SS")
+            date = input(" > ")
+
+        return date
+
     if bin == 'y':
         print ("How many minutes would you like to offset by?")
         off = int(input(" > (can be +/-): "))
